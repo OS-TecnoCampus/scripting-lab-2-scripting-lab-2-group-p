@@ -2,5 +2,5 @@ PHYTHON CODE ANALYSIS
 TecnoCampus
 January, 2020
 The  information  contained  in  this  document  may  be  privileged  and  /  or  confidential.  Any  dissemination, 
-                                                    distribution or copying of this document by anyone other than the original recipients is strictly prohibited. If you 
-                                                    received this document in error, please notify the issuer immediately and delete any copies of this document. 
+distribution or copying of this document by anyone other than the original recipients is strictly prohibited. If you 
+received this document in error, please notify the issuer immediately and delete any copies of this document. 
