@@ -1,4 +1,5 @@
 from fpdf import FPDF
+import os
 
 
 class PDF(FPDF):
@@ -49,35 +50,67 @@ if f.mode == "r":
     for line in lines:
         if counter == 1:
             pdf.set_font_size(24)
-            # pdf.text(40, 150, line)
-            pdf.set_xy(40, 150)
-            pdf.cell(0, 10, line)
+            pdf.text(40, 150, line)
         elif counter == 2:
-            pdf.set_xy(40, 170)
-            pdf.cell(0, 10, line)
-            # pdf.text(40, 170, line)
+            pdf.text(40, 170, line)
         elif counter == 3:
             pdf.set_font_size(12)
-            # pdf.text(40, 200, line)
-            pdf.set_xy(40, 200)
-            pdf.cell(0, 10, line)
-        elif counter == 4:  # estos tres if quizas podrian hacerse mejor con un cell
+            pdf.text(40, 200, line)
+        elif counter == 4:
             pdf.set_font("Arial", 'B', 8)
-            # pdf.text(40, 254, line)
             pdf.set_xy(40, 254)
             pdf.cell(0, 10, line)
         elif counter == 5:
             pdf.set_xy(40, 258)
             pdf.cell(0, 10, line)
-            # pdf.text(0, 258, line)
         else:
             pdf.set_xy(40, 262)
             pdf.cell(0, 10, line)
-            # pdf.text(0, 262, line)
         counter += 1
 f.close()
 
+# creating the index
+pdf.add_page()
+f = open("resources/Index.txt", "r")
+if f.mode == "r":
+    lines = f.readlines()
+    counter = 1
+    for line in lines:
+        if counter == 1:
+            pdf.set_font("Arial", 'B', 12)
+            pdf.text(40, 20, line)  # Index
+        elif counter == 2:
+            pdf.text(40, 25, line)  # 1. INTRODUCTION
+        elif counter == 3:
+            pdf.set_font("Arial", '', 10)
+            pdf.text(45, 30, line)  # 1.1 DESCRIPTION
+        elif counter == 4:
+            pdf.text(45, 35, line)  # 1.2 OBJECTIVES
+        elif counter == 5:
+            pdf.text(45, 40, line)  # 1.3 STRUCTURE OF THE PROGRAM
+        elif counter == 6:
+            pdf.set_font("Arial", 'B', 12)
+            pdf.text(40, 45, line)  # 2. THE PROGRAMS
+            pdf.set_font("Arial", '', 10)
+            yCounter = 50
+            fileCounter = 1
+            for root, dirs, files in os.walk("ex1"):
+                for file in files:
+                    if file.endswith(".py"):
+                        filename = os.path.join(root, file)
+                        filename = "2." + str(fileCounter)+ " " + filename.split('\\')[1]
+                        pdf.text(45, yCounter, filename)
+                        yCounter += 5
+                        fileCounter += 1
+        elif counter == 7:
+            pdf.set_font("Arial", 'B', 12)
+            pdf.text(40, yCounter, line)  # 3. SOME STATISTICS
+        counter += 1
+    f.close()
+
+# generate the first category (introduction)
 pdf.add_page()
 
+# finish the PDF
 pdf.close()
 pdf.output('test.pdf', 'F')
