@@ -1,0 +1,7 @@
+2. The programs
+The list of the programs of the project is detailed in the next section
+Imported libraries are:
+Defined functions are:
+The comments on code are:
+The used variables are:
+The used functions are:

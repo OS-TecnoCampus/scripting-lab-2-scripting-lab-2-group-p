@@ -1,0 +1,9 @@
+1. Introduction
+1.1 Description
+This is a report document of the code in Python for project !. The files of the project are:
+1.2 Objectives
+The objective of the document is to extract from the project coded in Python the main components, with the functions, the variables. This is the way to have a better understanding of the code, and to shorten the time to manage any improvement or modification of the code.
+The document includes:
+The functions!The variables!The relationship between them!The imported libraries!The list of comments
+1.3 The structure of the project
+The structure of the code is:
