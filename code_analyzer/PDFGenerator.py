@@ -1,12 +1,14 @@
 from fpdf import FPDF
+from code_analyzer.scriptReader import *
 import os
+import redbaron
 
 
 class PDF(FPDF):
     def header(self):
         if self.page_no() != 1:
             # Logo
-            self.image("resources/tecnocampus.png", 160, 10, 33)
+            self.image("../resources/tecnocampus.png", 160, 10, 33)
             # Font
             self.set_font("Arial", size=10)
             # Move to the right
@@ -29,7 +31,6 @@ class PDF(FPDF):
 
 
 def main(directory):
-
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
     pdf.set_left_margin(25)
@@ -44,10 +45,10 @@ def main(directory):
     pdf.line(20, 275, 20, 10)
 
     # setting up the cover image
-    pdf.image("resources/tecnocampus.png", x=140, y=50, w=60)
+    pdf.image("../resources/tecnocampus.png", x=140, y=50, w=60)
 
     # setting up the rest of the cover
-    f = open("resources/Cover.txt", "r")
+    f = open("../resources/Cover.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         counter = 1
@@ -75,7 +76,7 @@ def main(directory):
 
     # creating the index
     pdf.add_page()
-    f = open("resources/Index.txt", "r")
+    f = open("../resources/Index.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         counter = 1
@@ -116,7 +117,7 @@ def main(directory):
 
     # generate the first category (introduction)
     pdf.add_page()
-    f = open("resources/Introduction.txt", "r")
+    f = open("../resources/Introduction.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         counter = 1
@@ -145,7 +146,7 @@ def main(directory):
             elif counter == 4:  # 1.2 Objectives
                 pdf.ln()
                 pdf.set_text_color(255, 200, 0)
-                pdf.set_font_size(12)
+                pdf.set_font("Arial", 'B', 12)
                 pdf.write(5, line)
                 pdf.ln()
             elif counter == 5:
@@ -180,7 +181,7 @@ def main(directory):
 
     # generate the second category (programs)
     pdf.add_page()
-    f = open("resources/Programs.txt", "r")
+    f = open("../resources/Programs.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         pdf.set_text_color(255, 200, 0)
@@ -201,10 +202,39 @@ def main(directory):
                     filename = os.path.join(root, file)
                     filename = "2." + str(fileCounter) + " " + filename.split('\\')[1]
                     pdf.write(5, filename)
-
+                    pdf.ln(10)
+                    pdf.set_font("Arial", '', 10)
+                    pdf.set_text_color(0)
+                    f.seek(0)
+                    with open(os.path.join(root, file), "r") as f2:
+                        red = redbaron.RedBaron(f2.read())
+                        counter = 1
+                        for line in lines:
+                            pdf.set_font("Arial", '', 10)
+                            pdf.write(5, line)
+                            pdf.ln()
+                            pdf.set_font("Arial", 'B', 10)
+                            if counter == 1:
+                                libraries = importedLibraries(red)
+                                if not libraries:
+                                    pdf.write(5, "  >   There are no imported libraries")
+                                    pdf.ln()
+                                else:
+                                    for library in libraries:
+                                        pdf.write(5, library)
+                                        pdf.ln(5)
+                            elif counter == 2:
+                                functions = definedFunctions(red)
+                                if not functions:
+                                    pdf.write(5, "  >   There are no defined functions")
+                                    pdf.ln()
+                                else:
+                                    for fun in functions:
+                                        pdf.write(5, fun)
+                                        pdf.ln(5)
+                            counter += 1
                     pdf.ln(10)
                     fileCounter += 1
-
 
     # finish the PDF
     pdf.close()
@@ -212,4 +242,4 @@ def main(directory):
 
 
 if __name__ == "__main__":
-    main("ex1")  # Esto es una prueba, hay que cambiarlo eventualmente
+    main("../ex1")  # Esto es una prueba, hay que cambiarlo eventualmente
