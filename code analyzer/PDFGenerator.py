@@ -29,7 +29,6 @@ class PDF(FPDF):
 
 
 def main(directory):
-    directory = "ex1"  # Esto es una prueba, hay que cambiarlo eventualmente
 
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
@@ -48,7 +47,7 @@ def main(directory):
     pdf.image("resources/tecnocampus.png", x=140, y=50, w=60)
 
     # setting up the rest of the cover
-    f = open("resources/cover.txt", "r")
+    f = open("resources/Cover.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         counter = 1
@@ -113,16 +112,16 @@ def main(directory):
                 yCounter += 5
                 pdf.text(25, yCounter, line)  # 3. SOME STATISTICS
             counter += 1
-        f.close()
+    f.close()
 
     # generate the first category (introduction)
     pdf.add_page()
-    f = open("resources/introduction.txt", "r")
+    f = open("resources/Introduction.txt", "r")
     if f.mode == "r":
         lines = f.readlines()
         counter = 1
         for line in lines:
-            if counter == 1:    # 1.Introduction
+            if counter == 1:  # 1.Introduction
                 pdf.set_text_color(255, 200, 0)
                 pdf.set_font_size(12)
                 pdf.write(5, line)
@@ -174,14 +173,43 @@ def main(directory):
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
                 pdf.write(5, line)
-                pdf.ln()
+                pdf.ln(10)
                 # Aqui iria toda la mierda de la generacion de la estructura que aun no se hacer
             counter += 1
+    f.close()
+
+    # generate the second category (programs)
+    pdf.add_page()
+    f = open("resources/Programs.txt", "r")
+    if f.mode == "r":
+        lines = f.readlines()
+        pdf.set_text_color(255, 200, 0)
+        pdf.set_font("Arial", 'B', 12)
+        pdf.write(5, "2. The programs")  # 2. The programs
+        pdf.ln(10)
+        pdf.set_font("Arial", '', 10)
+        pdf.set_text_color(0)
+        pdf.write(5, "The list of the programs of the project is detailed in the next section")
+        pdf.ln(10)
+
+        fileCounter = 1
+        for root, dirs, files in os.walk(directory):
+            for file in files:
+                if file.endswith(".py"):
+                    pdf.set_text_color(255, 200, 0)
+                    pdf.set_font("Arial", 'B', 12)
+                    filename = os.path.join(root, file)
+                    filename = "2." + str(fileCounter) + " " + filename.split('\\')[1]
+                    pdf.write(5, filename)
+
+                    pdf.ln(10)
+                    fileCounter += 1
+
 
     # finish the PDF
     pdf.close()
-    pdf.output('test.pdf', 'F')
+    pdf.output('test.pdf', 'F')  # Cambiarlo a Report_TCM una vez acabado
 
 
 if __name__ == "__main__":
-    main("ex1")     # Lo mismo aqui
+    main("ex1")  # Esto es una prueba, hay que cambiarlo eventualmente
