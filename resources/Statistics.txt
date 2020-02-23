@@ -1,0 +1,2 @@
+3. Some statistics
+The project has ! programs, with ! defined functions. The program defines ! variables and import ! libraries (external libraries) on ! lines of python code.

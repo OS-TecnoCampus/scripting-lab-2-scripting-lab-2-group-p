@@ -160,8 +160,6 @@ def main(directory):
             elif counter == 7:
                 pdf.set_font("Arial", 'B', 10)
                 for text in line.split('!'):
-                    # Quizas se tendria que comprovar si hay cada cosa y imprimirlo si se
-                    # da, se podria hacer con una array de bool importada facilmente
                     pdf.write(5, "      >   " + text)
                     pdf.ln(10)
             elif counter == 8:  # 1.3 Structure of the project
@@ -220,8 +218,8 @@ def main(directory):
                                     pdf.write(5, "  >   There are no imported libraries")
                                     pdf.ln()
                                 else:
-                                    for library in libraries:
-                                        pdf.write(5, library)
+                                    for lib in libraries:
+                                        pdf.write(5, lib)
                                         pdf.ln(5)
                             elif counter == 2:
                                 functions = definedFunctions(red)
@@ -232,9 +230,54 @@ def main(directory):
                                     for fun in functions:
                                         pdf.write(5, fun)
                                         pdf.ln(5)
+                            elif counter == 3:
+                                comments = commentsOnCode(red)
+                                if not comments:
+                                    pdf.write(5, "  >   There are no comments in the code")
+                                    pdf.ln()
+                                else:
+                                    for com in comments:
+                                        pdf.write(5, com)
+                                        pdf.ln(5)
                             counter += 1
+                            pdf.ln(5)
                     pdf.ln(10)
                     fileCounter += 1
+
+    # generate the third category (statistics)
+    pdf.add_page()
+    f = open("../resources/Statistics.txt", "r")
+    if f.mode == "r":
+        lines = f.readlines()
+        counter = 1
+        for line in lines:
+            if counter == 1:
+                pdf.set_text_color(255, 200, 0)
+                pdf.set_font("Arial", 'B', 12)
+                pdf.write(10, line)
+            elif counter == 2:
+                pdf.set_font("Arial", '', 10)
+                pdf.set_text_color(0)
+                fileCounter = 0
+                functionCounter = 0
+                variableCounter = 0
+                libraryCounter = 0
+                lineCounter = 0
+                for root, dirs, files in os.walk(directory):
+                    for file in files:
+                        if file.endswith(".py"):
+                            fileCounter += 1
+                            with open(os.path.join(root, file), "r") as f2:  # cuidado con el f2
+                                red = redbaron.RedBaron(f2.read())
+                                functionCounter += countFunctions(red)
+                                variableCounter += countVariables(red)
+                                libraryCounter += countLibraries(red)
+                                lineCounter += countLines(red)
+                pdf.write(5, line.split("!")[0] + fileCounter + line.split("!")[1] + functionCounter +
+                          line.split("!")[2] + variableCounter + line.split("!")[3] + libraryCounter +
+                          line.split("!")[4] + lineCounter)
+
+    # falta aqui reformatear el indice con las paginas y links adequados
 
     # finish the PDF
     pdf.close()
