@@ -2,17 +2,19 @@ import os
 import redbaron
 from code_analyzer.scriptReader import *
 
-# pene
+text = "lole"
 
-"""
-    lol
-"""
+num = "5"
 
-# adeaded
+str(text)
 
-# bazinga
+int(num)
+
+str(text)
+
+print(text)
 
 file = "./test.py"
 with open(file, "r") as f:
     red = redbaron.RedBaron(f.read())
-    commentsOnCode(red)
+    usedFunctions(red)

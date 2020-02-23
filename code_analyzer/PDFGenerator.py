@@ -273,9 +273,10 @@ def main(directory):
                                 variableCounter += countVariables(red)
                                 libraryCounter += countLibraries(red)
                                 lineCounter += countLines(red)
-                pdf.write(5, line.split("!")[0] + fileCounter + line.split("!")[1] + functionCounter +
-                          line.split("!")[2] + variableCounter + line.split("!")[3] + libraryCounter +
-                          line.split("!")[4] + lineCounter)
+                pdf.write(5, line.split("!")[0] + str(fileCounter) + line.split("!")[1] + str(functionCounter) +
+                          line.split("!")[2] + str(variableCounter) + line.split("!")[3] + str(libraryCounter) +
+                          line.split("!")[4] + str(lineCounter) + line.split("!")[5])
+            counter += 1
 
     # falta aqui reformatear el indice con las paginas y links adequados
 
