@@ -6,15 +6,19 @@ text = "lole"
 
 num = "5"
 
-str(text)
+text = "pene"
 
-int(num)
+lol = 41
 
-str(text)
+num = "39"
 
-print(text)
+text = "porque no va esto coño"
+
+text = "porfavor funciona"
+
+caca = 9
 
 file = "./test.py"
 with open(file, "r") as f:
     red = redbaron.RedBaron(f.read())
-    usedFunctions(red)
+    usedVariables(red)

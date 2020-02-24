@@ -44,10 +44,13 @@ def usedVariables(red):
     result = []
     counter = 0
     for node in nodes:
-        result.insert(counter, "    >   " + str(node).split("=")[0])
-
+        if counter == 0:
+            result.insert(counter, str(node).split("=")[0])
+        elif str(node).split("=")[0] not in result:
+            result.insert(counter, str(node).split("=")[0])
         counter += 1
-    print(result)
+    var = red.find(result[0])
+    print(var)
     # return result
 
 

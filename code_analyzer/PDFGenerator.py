@@ -30,6 +30,9 @@ class PDF(FPDF):
             self.cell(0, 10, 'Page ' + str(self.page_no()) + ' | {nb}', 0, 0, 'R')
 
 
+pdfPages = []
+
+
 def main(directory):
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
@@ -127,9 +130,13 @@ def main(directory):
                 pdf.set_font_size(12)
                 pdf.write(5, line)
                 pdf.ln()
+                pdfPages.append("?")
+                pdfPages.append(pdf.page_no())
             elif counter == 2:  # 1.1 Description
                 pdf.write(5, line)
                 pdf.ln()
+                pdfPages.append("!")
+                pdfPages.append(pdf.page_no())
             elif counter == 3:
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
@@ -149,6 +156,7 @@ def main(directory):
                 pdf.set_font("Arial", 'B', 12)
                 pdf.write(5, line)
                 pdf.ln()
+                pdfPages.append(pdf.page_no())
             elif counter == 5:
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
@@ -168,6 +176,7 @@ def main(directory):
                 pdf.set_font("Arial", 'B', 12)
                 pdf.write(5, line)
                 pdf.ln()
+                pdfPages.append(pdf.page_no())
             elif counter == 9:
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
@@ -185,6 +194,9 @@ def main(directory):
         pdf.set_text_color(255, 200, 0)
         pdf.set_font("Arial", 'B', 12)
         pdf.write(5, "2. The programs")  # 2. The programs
+        pdfPages.append("?")
+        pdfPages.append(pdf.page_no())
+        pdfPages.append("!")
         pdf.ln(10)
         pdf.set_font("Arial", '', 10)
         pdf.set_text_color(0)
@@ -199,6 +211,7 @@ def main(directory):
                     pdf.set_font("Arial", 'B', 12)
                     filename = os.path.join(root, file)
                     filename = "2." + str(fileCounter) + " " + filename.split('\\')[1]
+                    pdfPages.append(pdf.page_no())
                     pdf.write(5, filename)
                     pdf.ln(10)
                     pdf.set_font("Arial", '', 10)
@@ -254,7 +267,9 @@ def main(directory):
             if counter == 1:
                 pdf.set_text_color(255, 200, 0)
                 pdf.set_font("Arial", 'B', 12)
-                pdf.write(10, line)
+                pdf.write(10, line)     # 3. Some statistics
+                pdfPages.append("?")
+                pdfPages.append(pdf.page_no())
             elif counter == 2:
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
@@ -278,7 +293,24 @@ def main(directory):
                           line.split("!")[4] + str(lineCounter) + line.split("!")[5])
             counter += 1
 
-    # falta aqui reformatear el indice con las paginas y links adequados
+    # reformatting the index
+    lastPage = pdf.page
+    pdf.page = 2
+    y = 42
+    yCounter = 7
+    for page in pdfPages:
+        if str(page) == "!":
+            yCounter = 5
+            pdf.set_font("Arial", '', 10)
+        elif str(page) == "?":
+            yCounter = 7
+            pdf.set_font("Arial", 'B', 10)
+        else:
+            pdf.set_font("Arial", 'B', 10)
+            pdf.text(185, y, "pg " + str(page))
+            y += yCounter
+
+    pdf.page = lastPage
 
     # finish the PDF
     pdf.close()
