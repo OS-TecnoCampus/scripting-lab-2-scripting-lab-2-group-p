@@ -2,6 +2,7 @@ from fpdf import FPDF
 from code_analyzer.scriptReader import *
 import os
 import redbaron
+import networkx as nx
 
 
 class PDF(FPDF):
@@ -30,7 +31,7 @@ class PDF(FPDF):
             self.cell(0, 10, 'Page ' + str(self.page_no()) + ' | {nb}', 0, 0, 'R')
 
 
-pdfPages = []
+pdfPages = []  # static variable which will record the number page of every category
 
 
 def main(directory):
@@ -252,10 +253,29 @@ def main(directory):
                                     for com in comments:
                                         pdf.write(5, com)
                                         pdf.ln(5)
+                            elif counter == 4:
+                                variables = usedVariables(red)
+                                if not variables:
+                                    pdf.write(5, "  >   There are no defined or used variables in the code")
+                                    pdf.ln()
+                                else:
+                                    for var in variables:
+                                        pdf.write(5, var)
+                                        pdf.ln(5)
+                            elif counter == 5:
+                                functions = usedFunctions(red)
+                                if not functions:
+                                    pdf.write(5, "  >   There are no defined or used functions in the code")
+                                    pdf.ln()
+                                else:
+                                    for fun in functions:
+                                        pdf.write(5, fun)
+                                        pdf.ln(5)
                             counter += 1
                             pdf.ln(5)
                     pdf.ln(10)
                     fileCounter += 1
+    f.close()
 
     # generate the third category (statistics)
     pdf.add_page()
@@ -267,7 +287,7 @@ def main(directory):
             if counter == 1:
                 pdf.set_text_color(255, 200, 0)
                 pdf.set_font("Arial", 'B', 12)
-                pdf.write(10, line)     # 3. Some statistics
+                pdf.write(10, line)  # 3. Some statistics
                 pdfPages.append("?")
                 pdfPages.append(pdf.page_no())
             elif counter == 2:
@@ -288,10 +308,12 @@ def main(directory):
                                 variableCounter += countVariables(red)
                                 libraryCounter += countLibraries(red)
                                 lineCounter += countLines(red)
+                            f2.close()
                 pdf.write(5, line.split("!")[0] + str(fileCounter) + line.split("!")[1] + str(functionCounter) +
                           line.split("!")[2] + str(variableCounter) + line.split("!")[3] + str(libraryCounter) +
                           line.split("!")[4] + str(lineCounter) + line.split("!")[5])
             counter += 1
+    f.close()
 
     # reformatting the index
     lastPage = pdf.page
@@ -309,7 +331,6 @@ def main(directory):
             pdf.set_font("Arial", 'B', 10)
             pdf.text(185, y, "pg " + str(page))
             y += yCounter
-
     pdf.page = lastPage
 
     # finish the PDF

@@ -49,8 +49,12 @@ def usedVariables(red):
         elif str(node).split("=")[0] not in result:
             result.insert(counter, str(node).split("=")[0])
         counter += 1
-    var = red.find(result[0])
-    print(var)
+    nodes = red.find_all("tuple")
+    print(nodes)
+    for node in nodes:
+        result.insert(counter, str(node))
+        counter += 1
+    print(result)
     # return result
 
 

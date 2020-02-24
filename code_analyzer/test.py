@@ -1,24 +1,23 @@
 import os
 import redbaron
 from code_analyzer.scriptReader import *
+import networkx as nx
+import matplotlib.pyplot as plt
 
-text = "lole"
+G = nx.DiGraph()
 
-num = "5"
 
-text = "pene"
 
-lol = 41
 
-num = "39"
-
-text = "porque no va esto coño"
-
-text = "porfavor funciona"
-
-caca = 9
-
-file = "./test.py"
+"""
+# file = "./test.py"
+file = "../ex1/task2.py"
+counter = 0
 with open(file, "r") as f:
     red = redbaron.RedBaron(f.read())
-    usedVariables(red)
+    print(countLibraries(red))
+    counter += countLibraries(red)
+
+with open(file, "r") as f2:
+    red = redbaron.RedBaron(f2.read())
+    """
