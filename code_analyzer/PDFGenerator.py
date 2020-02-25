@@ -33,6 +33,7 @@ class PDF(FPDF):
 pdfPages = []  # static variable which will record the number page of every category
 
 
+
 def main(directory):
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
