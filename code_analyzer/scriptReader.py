@@ -1,3 +1,9 @@
+import os
+import redbaron
+import networkx as nx
+import matplotlib.pyplot as plt
+
+
 # returns a string list with all the imported libraries (including ones with the operation "from")
 def importedLibraries(red):
     nodes = red.find_all("import")
@@ -50,11 +56,9 @@ def usedVariables(red):
             result.insert(counter, str(node).split("=")[0])
         counter += 1
     nodes = red.find_all("tuple")
-    print(nodes)
     for node in nodes:
         result.insert(counter, str(node))
         counter += 1
-    print(result)
     # return result
 
 
@@ -73,9 +77,63 @@ def usedFunctions(red):
     for node in nodes:
         generics.insert(counter, str(node))
         counter += 1
-
-    print(generics)
     # return result
+
+
+# generates the graph of the structure of the directory
+def graphGenerator(directory):
+    G = nx.Graph()
+    totalLibraries = []  # here we store all the used libraries
+    functions = []  # here we store all the defined functions
+    scripts = []  # here we store lists with the libraries and the filename they are used in
+    filenames = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".py"):
+                filename = os.path.join(root, file)
+                filename = filename.split("\\")[1]
+                if filename not in G.nodes:
+                    G.add_node(filename)
+                    if filename not in filenames:
+                        filenames.append(filename)
+                with open(os.path.join(root, file), "r") as f:
+                    red = redbaron.RedBaron(f.read())
+                    # we search for all the imports and from imports and store them
+                    nodes = red.find_all("import")
+                    fileLibraries = []
+                    for node in nodes:
+                        fileLibraries.append(str(node).split("import ")[1])
+                    nodes = red.find_all("fromimport")
+                    for node in nodes:
+                        if str(node).split("import ")[1] not in fileLibraries:
+                            fileLibraries.append(str(node).split("import ")[1])
+                    for library in fileLibraries:
+                        if library not in totalLibraries:
+                            totalLibraries.append(library)
+                    libraries = [filename]
+                    libraries.extend(fileLibraries)
+                    scripts.append(libraries)
+                    # we search for all the defined functions and store them
+                    nodes = red.find_all("def")
+                    for node in nodes:
+                        funct = str(node).split("def")[1].split(":")[0]
+                        while funct in functions:
+                            funct += "\u2028"
+                        functions.append(funct)
+                        G.add_node(funct)
+                        G.add_edge(filename, funct)
+
+    # we generate the edges for the libraries
+    for script in scripts:
+        counter = 0
+        for lib in script:
+            if counter != 0:
+                if lib + ".py" in filenames:
+                    G.add_edge(script[0], lib + ".py")
+            counter += 1
+
+    nx.draw(G, pos=nx.spring_layout(G, k=1000), with_labels=True, node_size=2000, node_color='#00ecff', node_shape='s')
+    plt.savefig("../resources/graph.png")
 
 
 # returns an integer with the number of all the functions

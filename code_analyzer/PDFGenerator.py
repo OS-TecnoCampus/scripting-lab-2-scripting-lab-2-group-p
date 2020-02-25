@@ -2,7 +2,6 @@ from fpdf import FPDF
 from code_analyzer.scriptReader import *
 import os
 import redbaron
-import networkx as nx
 
 
 class PDF(FPDF):
@@ -183,7 +182,8 @@ def main(directory):
                 pdf.set_text_color(0)
                 pdf.write(5, line)
                 pdf.ln(10)
-                # Aqui iria toda la mierda de la generacion de la estructura que aun no se hacer
+                graphGenerator(directory)
+                pdf.image("../resources/graph.png", x=30, y=50, w=150)
             counter += 1
     f.close()
 
