@@ -295,9 +295,9 @@ def main(directory):
                 pdf.set_text_color(0)
                 fileCounter = 0
                 functionCounter = 0
-                variableCounter = 0
-                libraryCounter = 0
                 lineCounter = 0
+                variableCounter = countVariables(directory)
+                libraryCounter = countLibraries(directory)
                 for root, dirs, files in os.walk(directory):
                     for file in files:
                         if file.endswith(".py"):
@@ -305,9 +305,7 @@ def main(directory):
                             with open(os.path.join(root, file), "r") as f2:  # cuidado con el f2
                                 red = redbaron.RedBaron(f2.read())
                                 functionCounter += countFunctions(red)
-                                variableCounter += countVariables(red)
-                                libraryCounter += countLibraries(red)
-                                lineCounter += countLines(red)
+                                lineCounter += countLines(os.path.join(root, file))
                             f2.close()
                 pdf.write(5, line.split("!")[0] + str(fileCounter) + line.split("!")[1] + str(functionCounter) +
                           line.split("!")[2] + str(variableCounter) + line.split("!")[3] + str(libraryCounter) +
