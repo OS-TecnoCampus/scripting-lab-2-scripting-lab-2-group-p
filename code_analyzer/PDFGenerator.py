@@ -33,7 +33,6 @@ class PDF(FPDF):
 pdfPages = []  # static variable which will record the number page of every category
 
 
-
 def main(directory):
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
@@ -336,7 +335,7 @@ def main(directory):
 
     # finish the PDF
     pdf.close()
-    pdf.output('test.pdf', 'F')  # Cambiarlo a Report_TCM una vez acabado
+    pdf.output('../test.pdf', 'F')  # Cambiarlo a Report_TCM una vez acabado
 
 
 if __name__ == "__main__":
