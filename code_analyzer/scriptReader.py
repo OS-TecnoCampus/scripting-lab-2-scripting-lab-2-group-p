@@ -45,39 +45,13 @@ def commentsOnCode(red):
 
 
 # returns a string list with all the used variables
-def usedVariables(red):
-    nodes = red.find_all("assign")
-    result = []
-    counter = 0
-    for node in nodes:
-        if counter == 0:
-            result.insert(counter, str(node).split("=")[0])
-        elif str(node).split("=")[0] not in result:
-            result.insert(counter, str(node).split("=")[0])
-        counter += 1
-    nodes = red.find_all("tuple")
-    for node in nodes:
-        result.insert(counter, str(node))
-        counter += 1
-    # return result
+def usedVariables(directory):
+    return ""
 
 
 # returns a string list with all the used functions
-def usedFunctions(red):
-    nodes = red.find_all("def")
-    result = []
-    functions = []
-    counter = 0
-    for node in nodes:
-        functions.insert(counter, "    >   " + str(node).split("def")[1].split(":")[0])
-        counter += 1
-    generics = []
-    counter = 0
-    nodes = red.find_all("call")
-    for node in nodes:
-        generics.insert(counter, str(node))
-        counter += 1
-    # return result
+def usedFunctions(directory):
+    return ""
 
 
 # generates the graph of the structure of the directory
