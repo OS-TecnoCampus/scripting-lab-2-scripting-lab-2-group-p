@@ -50,10 +50,11 @@ for root, dirs, files in os.walk(directory):
                 nodes = red.find_all("assignment")
                 for node in nodes:
                     var = str(node.name)
-                    if var not in vNames:
-                        v = variable(var, int(node.absolute_bounding_box.top_left.line))
-                        vList.append(v)
-                        vNames.append(var)
+                    if '+' and '-' and '*' and '/' not in var:
+                        if var not in vNames:
+                            v = variable(var, int(node.absolute_bounding_box.top_left.line))
+                            vList.append(v)
+                            vNames.append(var)
                 nodes = red.find_all("tuple")
                 for node in nodes:
                     var = str(node.name)
@@ -79,11 +80,12 @@ for root, dirs, files in os.walk(directory):
                 nodes = red.find_all("assignment")
                 for node in nodes:
                     var = str(node.name)
-                    for v in vList:
-                        if v.name == var:
-                            if int(v.line) != int(node.absolute_bounding_box.top_left.line):
-                                v.add_reassignment(node.absolute_bounding_box.top_left.line)
-                            break
+                    if '+' and '-' and '*' and '/' not in var:
+                        for v in vList:
+                            if v.name == var:
+                                if int(v.line) != int(node.absolute_bounding_box.top_left.line):
+                                    v.add_reassignment(node.absolute_bounding_box.top_left.line)
+                                    break
                 # we search for every used variable
                 nodes = red.find_all("comparison")
                 for node in nodes:
@@ -113,6 +115,10 @@ for root, dirs, files in os.walk(directory):
                     elif ' / ' in var:
                         var = var.split(' / ')
                     for v in var:
+                        if '[' in v:
+                            v = v.split('[')[0]
+                        if '(' in v:
+                            v = v.split('(')[0]
                         for vb in vList:
                             if str(v) == vb.name:
                                 if int(vb.line) != int(node.absolute_bounding_box.top_left.line):
@@ -131,15 +137,36 @@ for root, dirs, files in os.walk(directory):
                                     vb.add_use(node.absolute_bounding_box.top_left.line)
                 nodes = red.find_all("atomTrailers")
                 for node in nodes:
+                    counter = 0
                     for n in node:
                         for v in vList:
-                            if str(node) == v.name:
+                            if str(v.name) in str(n) and counter != 0:
                                 v.add_use(node.absolute_bounding_box.top_left.line)
+                        counter += 1
+                nodes = red.find_all("assignment")
+                for node in nodes:
+                    var = str(node)
+                    if '+' or '-' or '*' or '/' in var:
+                        for v in vList:
+                            if var.split("= ")[1] == v.name:
+                                v.add_use(node.absolute_bounding_box.top_left.line)
+                # we search for every variable used within functions
+
+                # we search for every variable used with operators
+                nodes = red.find_all("atomTrailers")
+                for node in nodes:
+                    found = False
+                    for n in node:
+                        if found:
+                            if '[' not in str(n):
+                                v.add_operators("." + str(n) + ": line " + str(node.absolute_bounding_box.top_left.line))
+                                break
+                        for v in vList:
+                            if str(n) == v.name:
+                                found = True
+                                break
                 variables.extend(vList)
-"""
+
 for v in variables:
     print(v.name)
-    # print(v.line)
-    # print(v.reassignment)
     print(v.use)
-"""

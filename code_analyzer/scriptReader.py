@@ -4,6 +4,37 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
+class variable:
+    reassignment = []  # stores the line of every variable reassignment
+    use = []  # stores the line of every used variable
+    with_functions = []  # stores the line of every variable used within functions
+    operators = []  # stores the line of every variable used with operators
+
+    def __init__(self, name: str, line: int):
+        self.name = name  # stores the name of the variable
+        self.line = line  # stores the line of the first use in the variable
+        self.reassignment = []
+        self.use = []
+        self.with_functions = []
+        self.operators = []
+
+    def add_reassignment(self, var: str):
+        if var not in self.reassignment:
+            self.reassignment.append(var)
+
+    def add_use(self, var: str):
+        if var not in self.use:
+            self.use.append(var)
+
+    def add_with_functions(self, var: str):
+        if var not in self.with_functions:
+            self.with_functions.append(var)
+
+    def add_operators(self, var: str):
+        if var not in self.operators:
+            self.operators.append(var)
+
+
 # returns a string list with all the imported libraries (including ones with the operation "from")
 def importedLibraries(red):
     nodes = red.find_all("import")
