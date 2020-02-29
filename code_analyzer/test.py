@@ -5,38 +5,6 @@ from code_analyzer.scriptReader import *
 directory = "../ex1"
 variables = []  # stores every found variable
 
-
-class variable:
-    reassignment = []  # stores the line of every variable reassignment
-    use = []  # stores the line of every used variable
-    with_functions = []  # stores the line of every variable used within functions
-    operators = []  # stores the line of every variable used with operators
-
-    def __init__(self, name: str, line: int):
-        self.name = name  # stores the name of the variable
-        self.line = line  # stores the line of the first use in the variable
-        self.reassignment = []
-        self.use = []
-        self.with_functions = []
-        self.operators = []
-
-    def add_reassignment(self, var: str):
-        if var not in self.reassignment:
-            self.reassignment.append(var)
-
-    def add_use(self, var: str):
-        if var not in self.use:
-            self.use.append(var)
-
-    def add_with_functions(self, var: str):
-        if var not in self.with_functions:
-            self.with_functions.append(var)
-
-    def add_operators(self, var: str):
-        if var not in self.operators:
-            self.operators.append(var)
-
-
 for root, dirs, files in os.walk(directory):
     for file in files:
         if file.endswith(".py"):
@@ -139,9 +107,23 @@ for root, dirs, files in os.walk(directory):
                 for node in nodes:
                     counter = 0
                     for n in node:
-                        for v in vList:
-                            if str(v.name) in str(n) and counter != 0:
-                                v.add_use(node.absolute_bounding_box.top_left.line)
+                        var = str(n)
+                        if '(' in var:
+                            var = var.split('(')[1]
+                            var = var.split(')')[0]
+                        if '[' in var:
+                            var = var.split('[')[1]
+                            var = var.split(']')[0]
+                        if ',' in var:
+                            var = var.split(', ')
+                            for vr in var:
+                                for v in vList:
+                                    if str(v.name) == vr and counter != 0:
+                                        v.add_use(node.absolute_bounding_box.top_left.line)
+                        else:
+                            for v in vList:
+                                if str(v.name) == var and counter != 0:
+                                    v.add_use(node.absolute_bounding_box.top_left.line)
                         counter += 1
                 nodes = red.find_all("assignment")
                 for node in nodes:
@@ -150,8 +132,47 @@ for root, dirs, files in os.walk(directory):
                         for v in vList:
                             if var.split("= ")[1] == v.name:
                                 v.add_use(node.absolute_bounding_box.top_left.line)
+                                break
                 # we search for every variable used within functions
-
+                nodes = red.find_all("atomTrailers")
+                for node in nodes:
+                    counter = 0
+                    string = ""
+                    for n in nodes:
+                        var = str(n)
+                        if '(' in var:
+                            var = var.split('(')[1]
+                            var = var.split(')')[0]
+                        if '[' in var:
+                            var = var.split('[')[1]
+                            var = var.split(']')[0]
+                        if ',' in var:
+                            list = var.split(', ')
+                            for vr in list:
+                                for v in vList:
+                                    if str(v.name) == vr and counter != 0:
+                                        for fn in v.with_functions:
+                                            if fn == string:
+                                                fn.append(node.absolute_bounding_box.top_left.line)
+                                                break
+                                            elif not fn:
+                                                fn.append("!")
+                                                fn.append(string)
+                                                break
+                                        break
+                        else:
+                            for v in vList:
+                                if str(v.name) == var and counter != 0:
+                                    for fn in v.with_functions:
+                                        if fn[0] == string:
+                                            fn.append(node.absolute_bounding_box.top_left.line)
+                                            break
+                                        elif not fn:
+                                            fn.append(string)
+                                            break
+                                    break
+                        counter += 1
+                        string = string + "." + var
                 # we search for every variable used with operators
                 nodes = red.find_all("atomTrailers")
                 for node in nodes:
@@ -169,4 +190,5 @@ for root, dirs, files in os.walk(directory):
 
 for v in variables:
     print(v.name)
-    print(v.use)
+    for vr in v.with_functions:
+        print(vr)

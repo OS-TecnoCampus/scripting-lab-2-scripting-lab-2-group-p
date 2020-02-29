@@ -254,13 +254,48 @@ def main(directory):
                                         pdf.write(5, com)
                                         pdf.ln(5)
                             elif counter == 4:
-                                variables = usedVariables(red)
+                                variables = usedVariables(directory)
                                 if not variables:
                                     pdf.write(5, "  >   There are no defined or used variables in the code")
                                     pdf.ln()
                                 else:
                                     for var in variables:
-                                        pdf.write(5, var)
+                                        pdf.write(5, "  >   " + str(var.name))
+                                        pdf.ln()
+                                        pdf.write(5, "      -   First use in line " + str(var.line))
+                                        pdf.ln()
+                                        pdf.write(5, "      -   Next uses:")
+                                        pdf.ln()
+                                        if var.reassignment:
+                                            string = "          #   Reassignment: line "
+                                            count = 0
+                                            for re in var.reassignment:
+                                                if count < len(var.reassignment):
+                                                    string += str(re) + ", "
+                                                else:
+                                                    string += str(re)
+                                                count += 1
+                                            pdf.write(5, string)
+                                            pdf.ln()
+                                        if var.use:
+                                            string = "          #   Use: line "
+                                            count = 0
+                                            for used in var.use:
+                                                if count < len(var.use):
+                                                    string += str(used) + ", "
+                                                else:
+                                                    string += str(used)
+                                                count += 1
+                                            pdf.write(5, string)
+                                            pdf.ln()
+                                        if var.with_functions:
+                                            print("work in progress")
+                                        if var.operators:
+                                            pdf.write(5, "          #   Operators:")
+                                            pdf.ln()
+                                            for op in var.operators:
+                                                pdf.write(5, "              ->  " + op)
+                                                pdf.ln()
                                         pdf.ln(5)
                             elif counter == 5:
                                 functions = usedFunctions(red)
@@ -302,7 +337,7 @@ def main(directory):
                     for file in files:
                         if file.endswith(".py"):
                             fileCounter += 1
-                            with open(os.path.join(root, file), "r") as f2:  # cuidado con el f2
+                            with open(os.path.join(root, file), "r") as f2:
                                 red = redbaron.RedBaron(f2.read())
                                 functionCounter += countFunctions(red)
                                 lineCounter += countLines(os.path.join(root, file))
