@@ -3,6 +3,68 @@ import redbaron
 from code_analyzer.scriptReader import *
 
 directory = "../ex1"
+fromFunctions = []
+libraries = []
+
+for root, dirs, files in os.walk(directory):
+    for file in files:
+        if file.endswith(".py"):
+            filename = os.path.join(root, file)
+            filename = filename.split("\\")[1]
+            vList = []  # stores every found variable
+            vNames = []  # stores the name of every variable without repetitions
+            with open(os.path.join(root, file), "r") as f:
+                #   we search for every library function
+                red = redbaron.RedBaron(f.read())
+                lib = importedLibraries(red)
+                for library in lib:
+                    library = library.split('   >   ')[1]
+                    library = library.split(':')[0]
+                    library = library.split(" ")[1]
+                    libraries.append(library)
+                nodes = red.find_all("atomTrailers")
+                for node in nodes:
+                    string = ""
+                    library = ""
+                    found = False
+                    for n in node:
+                        var = str(n)
+                        if '(' not in var:
+                            if not found:
+                                for lib in libraries:
+                                    if var == lib:
+                                        found = True
+                                        library = var
+                                        break
+                            else:
+                                string += "." + var
+                    if found:
+                        if not fromFunctions:
+                            fromFunctions.append([library, string + "():  line " + str(node.absolute_bounding_box.top_left.line)])
+                        else:
+                            found = False
+                            for lb in fromFunctions:
+                                if lb[0] == library:
+                                    found = True
+                                    counter = 0
+                                    for fn in lb:
+                                        if counter != 0:
+                                            if fn.split('():')[0] == string:
+                                                lb[counter] = lb[counter] + ", " + str(node.absolute_bounding_box.top_left.line)
+                                                break
+                                        counter += 1
+                                    break
+                            if not found:
+                                fromFunctions.append([library, string + "():  line " + str(node.absolute_bounding_box.top_left.line)])
+
+for libr in libraries:
+    print(libr)
+for fn in fromFunctions:
+    for l in fn:
+        print(str(l))
+
+
+"""
 variables = []  # stores every found variable
 
 for root, dirs, files in os.walk(directory):
@@ -134,45 +196,82 @@ for root, dirs, files in os.walk(directory):
                                 v.add_use(node.absolute_bounding_box.top_left.line)
                                 break
                 # we search for every variable used within functions
-                nodes = red.find_all("atomTrailers")
+                variab = []
+                nodes = red.find_all("callArgument")
                 for node in nodes:
-                    counter = 0
-                    string = ""
-                    for n in nodes:
-                        var = str(n)
-                        if '(' in var:
-                            var = var.split('(')[1]
-                            var = var.split(')')[0]
-                        if '[' in var:
-                            var = var.split('[')[1]
-                            var = var.split(']')[0]
-                        if ',' in var:
-                            list = var.split(', ')
-                            for vr in list:
-                                for v in vList:
-                                    if str(v.name) == vr and counter != 0:
-                                        for fn in v.with_functions:
-                                            if fn == string:
-                                                fn.append(node.absolute_bounding_box.top_left.line)
-                                                break
-                                            elif not fn:
-                                                fn.append("!")
-                                                fn.append(string)
-                                                break
-                                        break
+                    var = str(node)
+                    if '"' not in var:
+                        vr = []
+                        if '+' in var:
+                            vr.extend(var.split(' + '))
+                        elif '-' in var:
+                            vr.extend(var.split(' - '))
+                        elif '*' in var:
+                            vr.extend(var.split(' * '))
+                        elif '/' in var:
+                            vr.extend(var.split(' / '))
+                        elif '.' in var:
+                            vr.extend(var.split('.'))
+                        elif '[' in var:
+                            v1 = var.split('[')[0]
+                            v2 = var.split('[')[1]
+                            v2 = v2.split(']')[0]
+                            vr.extend(v1)
+                            vr.extend(v2)
                         else:
+                            vr.extend(var)
+                        for vari in vr:
                             for v in vList:
-                                if str(v.name) == var and counter != 0:
-                                    for fn in v.with_functions:
-                                        if fn[0] == string:
-                                            fn.append(node.absolute_bounding_box.top_left.line)
-                                            break
-                                        elif not fn:
-                                            fn.append(string)
-                                            break
+                                if str(v.name) == vari:
+                                    variab.append(vari)
                                     break
-                        counter += 1
-                        string = string + "." + var
+                nodes = red.find_all("atomTrailers")
+                for vri in variab:
+                    for node in nodes:
+                        string = ""
+                        counter = 0
+                        for n in node:
+                            var = str(n)
+                            if '(' not in var:
+                                if counter == 0:
+                                    string = var
+                                else:
+                                    string += "." + var
+                            else:
+                                var = var.split("(")[1]
+                                var = var.split(")")[0]
+                                vr = []
+                                if '+' in var:
+                                    vr.extend(var.split(' + '))
+                                elif '-' in var:
+                                    vr.extend(var.split(' - '))
+                                elif '*' in var:
+                                    vr.extend(var.split(' * '))
+                                elif '/' in var:
+                                    vr.extend(var.split(' / '))
+                                elif '.' in var:
+                                    vr.extend(var.split('.'))
+                                elif '[' in var:
+                                    v1 = var.split('[')[0]
+                                    v2 = var.split('[')[1]
+                                    v2 = v2.split(']')[0]
+                                    vr.extend(v1)
+                                    vr.extend(v2)
+                                else:
+                                    vr.extend(var)
+                                for vari in vr:
+                                    for v in vList:
+                                        if str(v.name) == vari:
+                                            found = False
+                                            for function in v.with_functions:
+                                                if string == str(function).split(':')[0]:
+                                                    function += ", " + str(node.absolute_bounding_box.top_left.line)
+                                                    found = True
+                                                    break
+                                            if not found:
+                                                v.add_with_functions(string + ": line " + str(node.absolute_bounding_box.top_left.line))
+                                            break
+                            counter += 1
                 # we search for every variable used with operators
                 nodes = red.find_all("atomTrailers")
                 for node in nodes:
@@ -180,7 +279,8 @@ for root, dirs, files in os.walk(directory):
                     for n in node:
                         if found:
                             if '[' not in str(n):
-                                v.add_operators("." + str(n) + ": line " + str(node.absolute_bounding_box.top_left.line))
+                                v.add_operators(
+                                    "." + str(n) + ": line " + str(node.absolute_bounding_box.top_left.line))
                                 break
                         for v in vList:
                             if str(n) == v.name:
@@ -189,6 +289,6 @@ for root, dirs, files in os.walk(directory):
                 variables.extend(vList)
 
 for v in variables:
-    print(v.name)
-    for vr in v.with_functions:
-        print(vr)
+    print(str(v.name))
+    print(str(v.with_functions))
+"""

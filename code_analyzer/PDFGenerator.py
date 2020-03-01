@@ -33,7 +33,16 @@ class PDF(FPDF):
 pdfPages = []  # static variable which will record the number page of every category
 
 
-def main(directory):
+def main():
+    inputed = False
+
+    while not inputed:
+        directory = input("Please type the directory with the python files you want to analyze: ")
+        if os.path.isdir(directory):
+            inputed = True
+        else:
+            print("Could not find the specified directory")
+
     # setting up the pdf configuration
     pdf = PDF(orientation='P', unit='mm', format='A4')
     pdf.set_left_margin(25)
@@ -254,7 +263,7 @@ def main(directory):
                                         pdf.write(5, com)
                                         pdf.ln(5)
                             elif counter == 4:
-                                variables = usedVariables(directory)
+                                variables = usedVariables(red)
                                 if not variables:
                                     pdf.write(5, "  >   There are no defined or used variables in the code")
                                     pdf.ln()
@@ -289,7 +298,12 @@ def main(directory):
                                             pdf.write(5, string)
                                             pdf.ln()
                                         if var.with_functions:
-                                            print("work in progress")
+                                            """
+                                            pdf.write(5, "          #   With functions:")
+                                            pdf.ln()
+                                            for fun in var.with_functions:
+                                                pdf.write(5, "              ->  " + str(fun))
+                                                pdf.ln() """
                                         if var.operators:
                                             pdf.write(5, "          #   Operators:")
                                             pdf.ln()
@@ -303,9 +317,37 @@ def main(directory):
                                     pdf.write(5, "  >   There are no defined or used functions in the code")
                                     pdf.ln()
                                 else:
-                                    for fun in functions:
-                                        pdf.write(5, fun)
-                                        pdf.ln(5)
+                                    cn = 0
+                                    for fn in functions:
+                                        if cn == 0:
+                                            for fromFunctions in fn:
+                                                cn2 = 0
+                                                for ln in fromFunctions:
+                                                    if cn2 == 0:
+                                                        pdf.write(5, "  >   From " + ln + ":")
+                                                        pdf.ln()
+                                                    else:
+                                                        pdf.write(5, "      -   " + ln)
+                                                        pdf.ln()
+                                                    cn2 += 1
+                                        elif cn == 1:
+                                            pdf.write(5, "  >   Generic:")
+                                            pdf.ln()
+                                            for generics in fn:
+                                                pdf.write(5, "      -   " + generics)
+                                                pdf.ln()
+                                        elif cn == 2:
+                                            for withVariable in fn:
+                                                cn2 = 0
+                                                for ln in withVariable:
+                                                    if cn2 == 0:
+                                                        pdf.write(5, "      >   With variable" + ln + ":")
+                                                        pdf.ln()
+                                                    else:
+                                                        pdf.write(5, "          -   " + ln)
+                                                        pdf.ln()
+                                                    cn2 += 1
+                                        cn += 1
                             counter += 1
                             pdf.ln(5)
                     pdf.ln(10)
@@ -367,9 +409,9 @@ def main(directory):
     pdf.page = lastPage
 
     # finish the PDF
-    pdf.close()
     pdf.output('../test.pdf', 'F')  # Cambiarlo a Report_TCM una vez acabado
+    pdf.close()
 
 
 if __name__ == "__main__":
-    main("../ex1")  # Esto es una prueba, hay que cambiarlo eventualmente
+    main()
