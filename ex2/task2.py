@@ -53,11 +53,11 @@ def main():
 
         answerSheet = """<h1 align = "center">Complete Forms of {0} Irregular Verbs</h1>
                 <table align = "center" border='1'><tr><th>Infinitive</th><th>Past</th>
-                <th>Past Participle</th><th>Català</th></tr>""".format(number)
+                <th>Past Participle</th><th>Catala</th></tr>""".format(number)
 
         quizSheet = """<h1 align = "center">Quiz of {0} Irregular Verbs</h1>
                     <table border='1' align = "center"><tr><th>Infinitive</th><th>Past</th>
-                    <th>Past Participle</th><th>Català</th></tr>""".format(number)
+                    <th>Past Participle</th><th>Catala</th></tr>""".format(number)
 
         for x in range(lastVerb, lastVerb + number):
             # Complete Table

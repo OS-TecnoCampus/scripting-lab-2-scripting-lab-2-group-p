@@ -146,7 +146,7 @@ def main():
                 pdf.ln()
                 pdfPages.append("!")
                 pdfPages.append(pdf.page_no())
-            elif counter == 3:
+            elif counter == 3:  # Files of the project
                 pdf.set_font("Arial", '', 10)
                 pdf.set_text_color(0)
                 pdf.write(5, line.split('!')[0] + directory + line.split('!')[1])
@@ -298,12 +298,11 @@ def main():
                                             pdf.write(5, string)
                                             pdf.ln()
                                         if var.with_functions:
-                                            """
                                             pdf.write(5, "          #   With functions:")
                                             pdf.ln()
                                             for fun in var.with_functions:
                                                 pdf.write(5, "              ->  " + str(fun))
-                                                pdf.ln() """
+                                                pdf.ln()
                                         if var.operators:
                                             pdf.write(5, "          #   Operators:")
                                             pdf.ln()
@@ -409,7 +408,7 @@ def main():
     pdf.page = lastPage
 
     # finish the PDF
-    pdf.output('../test.pdf', 'F')  # Cambiarlo a Report_TCM una vez acabado
+    pdf.output('../Report_TCM.pdf', 'F')
     pdf.close()
 
 

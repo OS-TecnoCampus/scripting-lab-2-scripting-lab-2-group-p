@@ -228,53 +228,52 @@ def usedVariables(red):
                         variab.append(vari)
                         break
     nodes = red.find_all("atomTrailers")
-    for vri in variab:
-        for node in nodes:
-            string = ""
-            counter = 0
-            for n in node:
-                var = str(n)
-                if '(' not in var:
-                    if counter == 0:
-                        string = var
-                    else:
-                        string += "." + var
+    for node in nodes:
+        string = ""
+        counter = 0
+        for n in node:
+            var = str(n)
+            if '(' not in var:
+                if counter == 0:
+                    string = var
                 else:
-                    var = var.split("(")[1]
-                    var = var.split(")")[0]
-                    vr = []
-                    if '+' in var:
-                        vr.extend(var.split(' + '))
-                    elif '-' in var:
-                        vr.extend(var.split(' - '))
-                    elif '*' in var:
-                        vr.extend(var.split(' * '))
-                    elif '/' in var:
-                        vr.extend(var.split(' / '))
-                    elif '.' in var:
-                        vr.extend(var.split('.'))
-                    elif '[' in var:
-                        v1 = var.split('[')[0]
-                        v2 = var.split('[')[1]
-                        v2 = v2.split(']')[0]
-                        vr.extend(v1)
-                        vr.extend(v2)
-                    else:
-                        vr.extend(var)
-                    for vari in vr:
-                        for v in vList:
-                            if str(v.name) == vari:
-                                found = False
-                                for function in v.with_functions:
-                                    if string == str(function).split(':')[0]:
-                                        function += ", " + str(node.absolute_bounding_box.top_left.line)
-                                        found = True
-                                        break
-                                if not found:
-                                    v.add_with_functions(
-                                        string + ": line " + str(node.absolute_bounding_box.top_left.line))
-                                break
-                counter += 1
+                    string += "." + var
+            else:
+                var = var.split("(")[1]
+                var = var.split(")")[0]
+                vr = []
+                if '+' in var:
+                    vr.extend(var.split(' + '))
+                elif '-' in var:
+                    vr.extend(var.split(' - '))
+                elif '*' in var:
+                    vr.extend(var.split(' * '))
+                elif '/' in var:
+                    vr.extend(var.split(' / '))
+                elif '.' in var:
+                    vr.extend(var.split('.'))
+                elif '[' in var:
+                    v1 = var.split('[')[0]
+                    v2 = var.split('[')[1]
+                    v2 = v2.split(']')[0]
+                    vr.extend(v1)
+                    vr.extend(v2)
+                else:
+                    vr.extend(var)
+                for vari in vr:
+                    for v in vList:
+                        if str(v.name) == vari:
+                            found = False
+                            for function in v.with_functions:
+                                if string == str(function).split(':')[0]:
+                                    function += ", " + str(node.absolute_bounding_box.top_left.line)
+                                    found = True
+                                    break
+                            if not found:
+                                v.add_with_functions(
+                                    string + ": line " + str(node.absolute_bounding_box.top_left.line))
+                            break
+            counter += 1
     # we search for every variable used with operators
     nodes = red.find_all("atomTrailers")
     for node in nodes:
@@ -395,7 +394,7 @@ def usedFunctions(red):
             var = str(node.iterator).split(", ")
             for v in var:
                 if v not in vNames:
-                    vNames.append(var)
+                    vNames.append(v)
         else:
             if str(node.iterator) not in vNames:
                 vNames.append(str(node.iterator))
@@ -406,8 +405,7 @@ def usedFunctions(red):
             var = str(n)
             if '(' not in var:
                 for v in vNames:
-                    if var == v:
-                        print("ok")
+                    if v in var:
                         if not withVariable:
                             withVariable.append([var, string + ": line " + str(node.absolute_bounding_box.top_left.line)])
                         else:

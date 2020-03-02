@@ -42,7 +42,7 @@ def main():
 
     answerSheet = """<h1 align = "center">Complete Forms of {0} Irregular Verbs</h1>
                   <table align = "center" border='1'><tr><th>Infinitive</th><th>Past</th>
-                  <th>Past Participle</th><th>Català</th></tr>""".format(n)
+                  <th>Past Participle</th><th>Catala</th></tr>""".format(n)
 
     for i in marcatge:
         answerSheet = answerSheet + "<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>".format(infinitive[i],
@@ -54,7 +54,7 @@ def main():
     # Partial Table
     quizSheet = """<h1 align = "center">Quiz of {0} Irregular Verbs</h1>
                  <table border='1' align = "center"><tr><th>Infinitive</th><th>Past</th>
-                 <th>Past Participle</th><th>Català</th></tr>""".format(n)
+                 <th>Past Participle</th><th>Catala</th></tr>""".format(n)
 
     for i in marcatge:
         c = random.randint(0, 3)
