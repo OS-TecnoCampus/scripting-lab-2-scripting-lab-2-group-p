@@ -340,7 +340,7 @@ def main():
                                                 cn2 = 0
                                                 for ln in withVariable:
                                                     if cn2 == 0:
-                                                        pdf.write(5, "      >   With variable" + ln + ":")
+                                                        pdf.write(5, "  >   With variable " + ln + ":")
                                                         pdf.ln()
                                                     else:
                                                         pdf.write(5, "          -   " + ln)

@@ -206,26 +206,29 @@ def usedVariables(red):
             vr = []
             if '+' in var:
                 vr.extend(var.split(' + '))
-            elif '-' in var:
+            if '-' in var:
                 vr.extend(var.split(' - '))
-            elif '*' in var:
+            if '*' in var:
                 vr.extend(var.split(' * '))
-            elif '/' in var:
+            if '/' in var:
                 vr.extend(var.split(' / '))
-            elif '.' in var:
+            if '.' in var:
                 vr.extend(var.split('.'))
-            elif '[' in var:
+            if '[' in var:
                 v1 = var.split('[')[0]
-                v2 = var.split('[')[1]
-                v2 = v2.split(']')[0]
-                vr.extend(v1)
-                vr.extend(v2)
+                vr.append(v1)
             else:
-                vr.extend(var)
+                vr.append(var)
             for vari in vr:
                 for v in vList:
                     if str(v.name) == vari:
-                        variab.append(vari)
+                        found = False
+                        for vb in variab:
+                            if vari == vb:
+                                found = True
+                                break
+                        if not found:
+                            variab.append(vari)
                         break
     nodes = red.find_all("atomTrailers")
     for node in nodes:
@@ -242,24 +245,23 @@ def usedVariables(red):
                 var = var.split("(")[1]
                 var = var.split(")")[0]
                 vr = []
+                if ',' in var:
+                    vr.extend(var.split(', '))
                 if '+' in var:
                     vr.extend(var.split(' + '))
-                elif '-' in var:
+                if '-' in var:
                     vr.extend(var.split(' - '))
-                elif '*' in var:
+                if '*' in var:
                     vr.extend(var.split(' * '))
-                elif '/' in var:
+                if '/' in var:
                     vr.extend(var.split(' / '))
-                elif '.' in var:
+                if '.' in var:
                     vr.extend(var.split('.'))
-                elif '[' in var:
+                if '[' in var:
                     v1 = var.split('[')[0]
-                    v2 = var.split('[')[1]
-                    v2 = v2.split(']')[0]
-                    vr.extend(v1)
-                    vr.extend(v2)
+                    vr.append(v1)
                 else:
-                    vr.extend(var)
+                    vr.append(var)
                 for vari in vr:
                     for v in vList:
                         if str(v.name) == vari:
@@ -271,7 +273,7 @@ def usedVariables(red):
                                     break
                             if not found:
                                 v.add_with_functions(
-                                    string + ": line " + str(node.absolute_bounding_box.top_left.line))
+                                    string + "(): line " + str(node.absolute_bounding_box.top_left.line))
                             break
             counter += 1
     # we search for every variable used with operators
@@ -400,27 +402,46 @@ def usedFunctions(red):
                 vNames.append(str(node.iterator))
     nodes = red.find_all("atomTrailers")
     for node in nodes:
-        string = ""
-        for n in nodes:
-            var = str(n)
+        string = str(node)
+        n = str(node).split(".")
+        for nd in n:
+            var = str(nd)
             if '(' not in var:
                 for v in vNames:
-                    if v in var:
+                    if str(v) == var:
                         if not withVariable:
                             withVariable.append([var, string + ": line " + str(node.absolute_bounding_box.top_left.line)])
                         else:
                             counter = 0
+                            foundVar = False
+                            foundFun = False
                             for vr in withVariable:
                                 if vr[0] == var:
+                                    foundVar = True
                                     for ln in vr:
                                         if counter != 0:
                                             if ln == string.split(':')[0]:
                                                 vr[counter] = vr[counter] + str(node.absolute_bounding_box.top_left.line)
+                                                foundFun = True
                                                 break
                                         counter += 1
                                     break
+                            if not foundVar:
+                                if '(' in string:
+                                    string = string.split("(")[0]
+                                    withVariable.append([var, string + "(): line " + str(node.absolute_bounding_box.top_left.line)])
+                                else:
+                                    withVariable.append([var, string + ": line " + str(node.absolute_bounding_box.top_left.line)])
+                            if not foundFun and foundVar:
+                                for vr in withVariable:
+                                    if vr[0] == var:
+                                        if '(' in string:
+                                            string = string.split("(")[0]
+                                            vr.append(string + "(): line " + str(node.absolute_bounding_box.top_left.line))
+                                        else:
+                                            vr.append(string + ": line " + str(node.absolute_bounding_box.top_left.line))
+                                        break
                         break
-                string += "." + var
     # we recollect all the data we've found
     usedFunctions.append(fromFunctions)
     usedFunctions.append(genericFunctions)
